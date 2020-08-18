@@ -167,11 +167,34 @@ void MoveToPos(double Xvalue, double Yvalue, double Angle, double kPx, double kI
     if (AngleCount >= 10 && YCount >= 10 && XCount >= 10){ //if all count variables are 10 more more...
       return; //break from function
     }
-    LeftFront.spin(forward, XmVrequest + YmVrequest - AnglemVrequest, voltageUnits::mV); //Motion
-    LeftBack.spin(forward, XmVrequest + YmVrequest + AnglemVrequest, voltageUnits::mV);  //Motion
-    RightFront.spin(forward, XmVrequest - YmVrequest + AnglemVrequest, voltageUnits::mV);//Motion
-    RightBack.spin(forward, XmVrequest - YmVrequest - AnglemVrequest, voltageUnits::mV); //Motion
-    vex::task::sleep(10); //Slight delay so the Brain doesn't overprocess
+    LeftFrontValue = XmVrequest + YmVrequest - AnglemVrequest;
+    LeftBackValue = XmVrequest + YmVrequest + AnglemVrequest;
+    RightFrontValue = XmVrequest - YmVrequest + AnglemVrequest;
+    RightBackValue = XmVrequest - YmVrequest - AnglemVrequest;
+    MaxVoltage = 12000; //this is the highest valid value for the spin function in millivolts
+    if (fabs(LeftFrontValue) > MaxVoltage || fabs(LeftBackValue) > MaxVoltage || fabs(RightFrontValue) > MaxVoltage || fabs(RightBackValue) > MaxVoltage){
+      if (LeftFrontValue>=LeftBackValue && LeftFrontValue>=RightFrontValue && LeftFrontValue>=RightBackValue) {
+        MaxValue = LeftFrontValue / MaxVoltage;
+      }
+      if (LeftBackValue>=LeftFrontValue && LeftBackValue>=RightFrontValue && LeftBackValue>=RightBackValue) {
+        MaxValue = LeftBackValue / MaxVoltage;
+      }
+      if (RightFrontValue>=LeftFrontValue && RightFrontValue>=LeftBackValue && RightFrontValue>=RightBackValue) {
+        MaxValue = RightFrontValue / MaxVoltage;
+      }
+      if (RightBackValue>=LeftFrontValue && RightBackValue>=LeftBackValue && RightBackValue>=RightFrontValue) {
+        MaxValue = RightBackValue / MaxVoltage;
+      }
+      LeftFrontValue /= MaxValue;
+      LeftBackValue /= MaxValue;
+      RightFrontValue /= MaxValue;
+      RightBackValue /= MaxValue;
+    }
+    LeftFront.spin(forward, LeftFrontValue, voltageUnits::mV); //Motion
+    LeftBack.spin(forward, LeftBackValue, voltageUnits::mV);  //Motion
+    RightFront.spin(forward, RightFrontValue, voltageUnits::mV);//Motion
+    RightBack.spin(forward, RightBackValue, voltageUnits::mV); //Motion
+    vex::task::sleep(5); //Slight delay so the Brain doesn't overprocess
 }
 void VariableReset ( void ){  //This resets all the variables for the PID functions
   AngleCount = 0;
