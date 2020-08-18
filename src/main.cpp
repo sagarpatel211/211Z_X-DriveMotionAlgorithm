@@ -167,28 +167,33 @@ void MoveToPos(double Xvalue, double Yvalue, double Angle, double kPx, double kI
     if (AngleCount >= 10 && YCount >= 10 && XCount >= 10){ //if all count variables are 10 more more...
       return; //break from function
     }
-    LeftFrontValue = XmVrequest + YmVrequest - AnglemVrequest;
-    LeftBackValue = XmVrequest + YmVrequest + AnglemVrequest;
-    RightFrontValue = XmVrequest - YmVrequest + AnglemVrequest;
-    RightBackValue = XmVrequest - YmVrequest - AnglemVrequest;
+    LeftFrontValue = XmVrequest + YmVrequest - AnglemVrequest; //voltage for each motor is calculated
+    LeftBackValue = XmVrequest + YmVrequest + AnglemVrequest;  //voltage for each motor is calculated
+    RightFrontValue = XmVrequest - YmVrequest + AnglemVrequest;//voltage for each motor is calculated
+    RightBackValue = XmVrequest - YmVrequest - AnglemVrequest; //voltage for each motor is calculated
     MaxVoltage = 12000; //this is the highest valid value for the spin function in millivolts
+    //If the voltage of any of the motors are greater than the Max voltage, they will be normalized
     if (fabs(LeftFrontValue) > MaxVoltage || fabs(LeftBackValue) > MaxVoltage || fabs(RightFrontValue) > MaxVoltage || fabs(RightBackValue) > MaxVoltage){
+      //if the leftfront motor has the highest voltage value...
       if (LeftFrontValue>=LeftBackValue && LeftFrontValue>=RightFrontValue && LeftFrontValue>=RightBackValue) {
-        MaxValue = LeftFrontValue / MaxVoltage;
+        MaxValue = LeftFrontValue / MaxVoltage; //the constant to divide all the motors is assigned a value so they are all under 12,000 V
       }
+      //if the leftback motor has the highest voltage value...
       if (LeftBackValue>=LeftFrontValue && LeftBackValue>=RightFrontValue && LeftBackValue>=RightBackValue) {
-        MaxValue = LeftBackValue / MaxVoltage;
+        MaxValue = LeftBackValue / MaxVoltage; //the constant to divide all the motors is assigned a value so they are all under 12,000 V
       }
+      //if the rightfront motor has the highest voltage value...     
       if (RightFrontValue>=LeftFrontValue && RightFrontValue>=LeftBackValue && RightFrontValue>=RightBackValue) {
-        MaxValue = RightFrontValue / MaxVoltage;
+        MaxValue = RightFrontValue / MaxVoltage; //the constant to divide all the motors is assigned a value so they are all under 12,000 V
       }
+      //if the rightback motor has the highest voltage value...
       if (RightBackValue>=LeftFrontValue && RightBackValue>=LeftBackValue && RightBackValue>=RightFrontValue) {
-        MaxValue = RightBackValue / MaxVoltage;
+        MaxValue = RightBackValue / MaxVoltage; //the constant to divide all the motors is assigned a value so they are all under 12,000 V
       }
-      LeftFrontValue /= MaxValue;
-      LeftBackValue /= MaxValue;
-      RightFrontValue /= MaxValue;
-      RightBackValue /= MaxValue;
+      LeftFrontValue /= MaxValue; //divide the motor value by the normalization factor
+      LeftBackValue /= MaxValue; //divide the motor value by the normalization factor
+      RightFrontValue /= MaxValue; //divide the motor value by the normalization factor
+      RightBackValue /= MaxValue; //divide the motor value by the normalization factor
     }
     LeftFront.spin(forward, LeftFrontValue, voltageUnits::mV); //Motion
     LeftBack.spin(forward, LeftBackValue, voltageUnits::mV);  //Motion
