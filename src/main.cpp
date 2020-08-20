@@ -15,8 +15,7 @@
 // Controller1          controller                    
 // MotorExample         motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
-
-/*-------------------------------Includes------------------------------------*/
+/*-------------------------------Packages------------------------------------*/
 #include "vex.h"
 #include <math.h>
 #include <iostream> 
@@ -30,11 +29,12 @@ vex::competition    Competition;
 #define SS 7.75 //distance from tracking center to middle of the tracking wheel
 #define WheelDiam 4.125 //diameter of all the wheels being used for tracking
 #define tpr 360  //Degrees per single encoder rotation
-double DeltaL,DeltaR,DeltaB,currentL,currentR,currentB,PreviousL,PreviousR,PreviousB,DeltaTheta;
-double X,Y,Theta,DeltaXSide,DeltaYSide,DeltaXBack,DeltaYBack,SideChord,BackChord,OdomHeading;
-//Motion Variables below
-double AngleError,AngleDerivative, AnglePreviousError,AngleIntegral,AngleCount,AnglemVrequest,XmVrequest,XError,
-XDerivative,XPreviousError,XIntegral,XCount,YmVrequest,YError,YDerivative,YPreviousError,YIntegral,YCount;
+double DeltaL,DeltaR,DeltaB,currentL,currentR,currentB,PreviousL,PreviousR,PreviousB,DeltaTheta,fullelapsedTime,
+X,Y,Theta,DeltaXSide,DeltaYSide,DeltaXBack,DeltaYBack,SideChord,BackChord,OdomHeading,elapsedTimeAngle,XError,
+AngleError,AngleDerivative,AnglePreviousError,AngleIntegral,AngleCount,AnglemVrequest,XmVrequest,
+XDerivative,XPreviousError,XIntegral,XCount,YmVrequest,YError,YDerivative,YPreviousError,YIntegral,YCount,
+LeftFrontValue,LeftBackValue,RightFrontValue,RightBackValue,MaxValue,MaxVoltage,elapsedTimeX,elapsedTimeY;
+double startingTime,starttimeAngle,starttimeX,starttimeY = 0;
 /*---------------------------------------------------------------------------*/
 /*                              Motion Functions                             */
 /*---------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ void TrackPOS() {
 // 2 cases could be occuring in odometry
 // 1: Going in a straight line
 // 2: Going in an arc motion
-// If the bot is on an angle and going straight the displacement would be linear at angle Theta, meaning a right triangle is formed (Trig ratios to calc movement)
+// If the bot is on an angle and going straight the displacement would be linear at angle Theta, meaning a right triangle is formed 
 // Since it is a linear motion, the Left and right will move the same amount so we can just pick a side and do our movement calculation
 // Since this calculation is working based of very infinitely small arcs, the displacement of the robot will be a chord
 // Below it Averages the Left and Right integrated motor encoders since we don't have encoders yet
@@ -107,10 +107,12 @@ void XdisplacementPID(double desiredX, double XkP, double XkI, double XkD){
   //XDerivative = (XError - XPreviousError);  //Derivative is calculated from (error - previous error)
 
 //Option 2: Does account for timescale (has 3 lines of code)
+  //calculate the time from the last step and this step (first run will be wrong but it's okay since 10ms is insignificant)
   elapsedTimeX = Brain.timer(timeUnits::msec) - starttimeX;
   XDerivative = (XError - XPreviousError)/elapsedTimeX;  //Derivative is calculated from (error - previous error)/dt
-  starttimeX = Brain.timer(timeUnits::msec);
-/*------------------------------------------------------------------------------------------------------------*/  if ((XError < 0.07) && (XError > -0.07)){ //if the error is really small (0.07 inches)...
+  starttimeX = Brain.timer(timeUnits::msec); //start the timer for this step to be used when this runs over again
+/*------------------------------------------------------------------------------------------------------------*/
+if ((XError < 0.07) && (XError > -0.07)){ //if the error is really small (0.07 inches)...
     XIntegral = 0; //Keep integral at 0
      XCount += 1; //add 1 to count
   } else { 
@@ -134,9 +136,10 @@ void YdisplacementPID(double desiredY, double YkP, double YkI, double YkD){
   //YDerivative = (YError - YPreviousError);  //Derivative is calculated from (error - previous error)
 
 //Option 2: Does account for timescale (has 3 lines of code)
+  //calculate the time from the last step and this step (first run will be wrong but it's okay since 10ms is insignificant)
   elapsedTimeY = Brain.timer(timeUnits::msec) - starttimeY;
   YDerivative = (YError - YPreviousError)/elapsedTimeY;  //Derivative is calculated from (error - previous error)/dt
-  starttimeY = Brain.timer(timeUnits::msec);
+  starttimeY = Brain.timer(timeUnits::msec); //start the timer for this step to be used when this runs over again
 /*------------------------------------------------------------------------------------------------------------*/
   if ((YError < 0.07) && (YError > -0.07)){ //if the error is really small (0.07 inches)...
     YIntegral = 0; //Keep integral at 0
@@ -162,9 +165,10 @@ void AngledisplacementPID(double desiredangle, double anglekP, double anglekI, d
   //AngleDerivative = (AngleError - AnglePreviousError);  //Derivative is calculated from (error - previous error)
 
 //Option 2: Does account for timescale (has 3 lines of code)
+  //calculate the time from the last step and this step (first run will be wrong but it's okay since 10ms is insignificant)
   elapsedTimeAngle = Brain.timer(timeUnits::msec) - starttimeAngle;
   AngleDerivative = (AngleError - AnglePreviousError)/elapsedTimeAngle;  //Derivative is calculated from (error - previous error)/dt
-  starttimeAngle = Brain.timer(timeUnits::msec);
+  starttimeAngle = Brain.timer(timeUnits::msec); //start the timer for this step to be used when this runs over again
 /*------------------------------------------------------------------------------------------------------------*/
   if ((AngleError < 0.1) && (AngleError > -0.1)){  //if the error is really small (0.1 degrees)...
       AngleIntegral = 0;  //Keep integral at 0
