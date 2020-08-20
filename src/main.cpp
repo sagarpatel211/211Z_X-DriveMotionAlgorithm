@@ -101,8 +101,16 @@ void TrackPOS() {
 //PID #1 - X Displacement PID//////////////////////////////////////////////////////////////////////////////////
 void XdisplacementPID(double desiredX, double XkP, double XkI, double XkD){
   XError = desiredX - X; //X error is calculated
-  XDerivative = XError - XPreviousError; //Derivative is calculated from error - previous error
-  if ((XError < 0.07) && (XError > -0.07)){ //if the error is really small (0.07 inches)...
+  //Currently we are stuck with 2 conflicting choices: accounting for timescale and not accounting for it...
+/*------------------------------------------------------------------------------------------------------------*/
+//Option 1: Does not account for timescale (currently commented out)
+  //XDerivative = (XError - XPreviousError);  //Derivative is calculated from (error - previous error)
+
+//Option 2: Does account for timescale (has 3 lines of code)
+  elapsedTimeX = Brain.timer(timeUnits::msec) - starttimeX;
+  XDerivative = (XError - XPreviousError)/elapsedTimeX;  //Derivative is calculated from (error - previous error)/dt
+  starttimeX = Brain.timer(timeUnits::msec);
+/*------------------------------------------------------------------------------------------------------------*/  if ((XError < 0.07) && (XError > -0.07)){ //if the error is really small (0.07 inches)...
     XIntegral = 0; //Keep integral at 0
      XCount += 1; //add 1 to count
   } else { 
@@ -120,7 +128,16 @@ void XdisplacementPID(double desiredX, double XkP, double XkI, double XkD){
 //PID #2 - Y Displacement PID//////////////////////////////////////////////////////////////////////////////////
 void YdisplacementPID(double desiredY, double YkP, double YkI, double YkD){
   YError = desiredY - Y; //X error is calculated
-  YDerivative = YError - YPreviousError; //Derivative is calculated from error - previous error
+  //Currently we are stuck with 2 conflicting choices: accounting for timescale and not accounting for it...
+/*------------------------------------------------------------------------------------------------------------*/
+//Option 1: Does not account for timescale (currently commented out)
+  //YDerivative = (YError - YPreviousError);  //Derivative is calculated from (error - previous error)
+
+//Option 2: Does account for timescale (has 3 lines of code)
+  elapsedTimeY = Brain.timer(timeUnits::msec) - starttimeY;
+  YDerivative = (YError - YPreviousError)/elapsedTimeY;  //Derivative is calculated from (error - previous error)/dt
+  starttimeY = Brain.timer(timeUnits::msec);
+/*------------------------------------------------------------------------------------------------------------*/
   if ((YError < 0.07) && (YError > -0.07)){ //if the error is really small (0.07 inches)...
     YIntegral = 0; //Keep integral at 0
      YCount += 1; //add 1 to count
@@ -139,7 +156,16 @@ void YdisplacementPID(double desiredY, double YkP, double YkI, double YkD){
 //PID #3 - Angle PID///////////////////////////////////////////////////////////////////////////////////////////
 void AngledisplacementPID(double desiredangle, double anglekP, double anglekI, double anglekD){
   AngleError = desiredangle - OdomHeading; //angle error is calculated
-  AngleDerivative = AngleError - AnglePreviousError;  //Derivative is calculated from error - previous error
+  //Currently we are stuck with 2 conflicting choices: accounting for timescale and not accounting for it...
+/*------------------------------------------------------------------------------------------------------------*/
+//Option 1: Does not account for timescale (currently commented out)
+  //AngleDerivative = (AngleError - AnglePreviousError);  //Derivative is calculated from (error - previous error)
+
+//Option 2: Does account for timescale (has 3 lines of code)
+  elapsedTimeAngle = Brain.timer(timeUnits::msec) - starttimeAngle;
+  AngleDerivative = (AngleError - AnglePreviousError)/elapsedTimeAngle;  //Derivative is calculated from (error - previous error)/dt
+  starttimeAngle = Brain.timer(timeUnits::msec);
+/*------------------------------------------------------------------------------------------------------------*/
   if ((AngleError < 0.1) && (AngleError > -0.1)){  //if the error is really small (0.1 degrees)...
       AngleIntegral = 0;  //Keep integral at 0
       AngleCount += 1; //add 1 to count
@@ -224,6 +250,7 @@ void VariableReset ( void ){  //This resets all the variables for the PID functi
   YIntegral = 0;
   YError = 0;
   YDerivative = 0;
+  Brain.resetTimer();
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -240,6 +267,7 @@ void pre_auton( void ) {
 /*                              Autonomous Task                              */
 /*---------------------------------------------------------------------------*/
 void autonomous( void ) {
+  VariableReset(); //Always reset first since the brain timer must reset for the PID loop to work
   //MoveToPos (X, Y, angle, PID values for x, PID values for y, PID values for angle)
   MotorExample.spin(forward,100,velocityUnits::pct);//sets an example motor to 100 to see if it will run while moving
   MoveToPos(10, 10, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0); //Example: X, Y = 10 and angle = 90
