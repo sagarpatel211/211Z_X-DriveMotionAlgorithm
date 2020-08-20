@@ -160,10 +160,12 @@ void AngledisplacementPID(double desiredangle, double anglekP, double anglekI, d
 void MoveToPos(double Xvalue, double Yvalue, double Angle, double kPx, double kIx, double kDx,
   double kPy, double kIy,double kDy,double kPa, double kIa,double kDa ){
   while (Xvalue != X && Yvalue != Y && Angle != OdomHeading) //if the robot reaches position, break loop. else...
+    startingTime = Brain.timer(timeUnits::msec);
     TrackPOS(); //run odometry function
     XdisplacementPID (Xvalue, kPx, kIx, kDx); //call the x displacement function
     YdisplacementPID (Yvalue, kPy, kIy, kDy); //call the y displacement function
     AngledisplacementPID (Angle, kPa, kIa, kDa); //call the angle displacement function
+
     if (AngleCount >= 10 && YCount >= 10 && XCount >= 10){ //if all count variables are 10 more more...
       return; //break from function
     }
@@ -199,8 +201,10 @@ void MoveToPos(double Xvalue, double Yvalue, double Angle, double kPx, double kI
     LeftBack.spin(forward, LeftBackValue, voltageUnits::mV);  //Motion
     RightFront.spin(forward, RightFrontValue, voltageUnits::mV);//Motion
     RightBack.spin(forward, RightBackValue, voltageUnits::mV); //Motion
-    vex::task::sleep(5); //Slight delay so the Brain doesn't overprocess
+    fullelapsedTime = Brain.timer(timeUnits::msec) - startingTime;
+    vex::task::sleep(15 - fullelapsedTime); //Slight delay so the Brain doesn't overprocess
 }
+
 void VariableReset ( void ){  //This resets all the variables for the PID functions
   AngleCount = 0;
   YCount = 0;
