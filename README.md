@@ -53,4 +53,4 @@ MoveToPos(10, 10, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0); //Example: The robot will move
 
 
 ## Contact
-[Email](mailto:patelsag@students.dsbn.org) | [Website](https://sagarpatel211.github.io/)
+[Email](mailto:sa24pate@uwaterloo.ca) | [Website](https://sagarpatel211.github.io/)
