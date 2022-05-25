@@ -86,16 +86,82 @@ void TrackPOS() {
     PreviousR = currentR;
     DeltaTheta = 0;
 
-    //This is for printing to the brain for debugging
-    Brain.Screen.printAt(100,20, "X: %f",X);
-    Brain.Screen.printAt(100,40, "Y: %f",Y);
-    Brain.Screen.printAt(100,60, "Theta: %f",Theta);
-    Brain.Screen.printAt(100,80, "Angle: %f",OdomHeading);
-    Brain.Screen.printAt(100,100, "Displacement1: %f",SideChord);
-    Brain.Screen.printAt(100,120, "DeltaLeftInches: %f",DeltaL);
-    Brain.Screen.printAt(100,140, "DeltaRightInches: %f",DeltaR);
-    Brain.Screen.printAt(100,160, "DeltaX: %f",DeltaXSide);
-    Brain.Screen.printAt(100,180, "DeltaY: %f",DeltaYSide);
+  /*--------------------GRAPHICS--------------------*/
+    //Coordinates for each section of text
+    int textadjustvalue = 55; //this adjusts the text value for each text block
+    int rowadjust = 39; //this adjusts the row value for each tile
+
+    //Sets graphical things for our display 
+    Brain.Screen.setPenWidth( 1 );
+    vex::color redtile = vex::color( 210, 31, 60 );
+    vex::color bluetile = vex::color( 14, 77, 146 );
+    vex::color graytile = vex::color( 49, 51, 53 );
+    Brain.Screen.setFillColor(vex::color( 0, 0, 0 ));
+    Brain.Screen.setFont(vex::fontType::mono20);
+    Brain.Screen.setPenColor( vex::color( 222, 49, 99 ) );
+
+    //Displays all the field tiles, text of odom values, and a dot symbolizing the robot
+    Brain.Screen.printAt(40,20 + textadjustvalue, "X-Pos:%f",-X);
+    Brain.Screen.setPenColor( vex::color( 191, 10, 48 ) );
+    Brain.Screen.printAt(40,50 + textadjustvalue, "Y-Pos:%f",Y);
+    Brain.Screen.setPenColor( vex::color( 141, 2, 31 ) );
+    Brain.Screen.printAt(40,80 + textadjustvalue, "Theta:%f",Theta);
+    Brain.Screen.setPenColor( vex::color( 83, 2, 1 ) );
+    Brain.Screen.printAt(40,110 + textadjustvalue, "Angle:%f",OdomHeading);
+    Brain.Screen.setPenColor( vex::color( 255, 255, 255 ) );
+    Brain.Screen.setFillColor( graytile );
+    Brain.Screen.drawRectangle( 245, 2, 234, 234 );
+    Brain.Screen.drawRectangle( 245, 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245, 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245, 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245, 197, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 41, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 158, 39, 39 );
+    Brain.Screen.drawRectangle( 245+rowadjust, 197, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 41, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 158, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(2*rowadjust), 197, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 41, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 158, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(3*rowadjust), 197, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 41, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 158, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(4*rowadjust), 197, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 2, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 80, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 119, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 197, 39, 39 );
+    Brain.Screen.setFillColor( redtile );
+    Brain.Screen.drawRectangle( 245, 158, 39, 39 );
+    Brain.Screen.drawRectangle( 245, 41, 39, 39 );
+    Brain.Screen.setFillColor( bluetile );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 41, 39, 39 );
+    Brain.Screen.drawRectangle( 245+(5*rowadjust), 158, 39, 39 );
+    Brain.Screen.setPenColor( vex::color( 255,255,255));
+    Brain.Screen.setFillColor( vex::color(0,0,0) );
+    
+    //This draws the robot body for position and arm for angle
+    double yfieldvalue = ((-Y)*fieldscale)+245-10;
+    double xfieldvalue = ((-X)*fieldscale)+245;
+    Brain.Screen.drawCircle(xfieldvalue, yfieldvalue, 10 );
+    Brain.Screen.setPenWidth( 4 );
+    //Line angle calculation:
+    //x1 and y1 are the robot's coordinates, which in our case is xfieldvalue and yfieldvalue
+    //angle is the angle the robot is facing, which in our case is Theta
+    //(x1,y1, x1 + line_length*cos(angle),y1 + line_length*sin(angle)) = (x1,y1,x2,y2)
+    Brain.Screen.drawLine(xfieldvalue, yfieldvalue, xfieldvalue+cos(-Theta-(Pi/2))*15, yfieldvalue+ sin(-Theta-(Pi/2)) *15);
 }
 
 //PID #1 - X Displacement PID//////////////////////////////////////////////////////////////////////////////////
